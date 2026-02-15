@@ -1,6 +1,7 @@
 package com.saygindogu.sheepgame.ui;
 
 import com.saygindogu.sheepgame.SheepGame;
+import com.saygindogu.sheepgame.model.Drawable;
 
 import java.awt.Dimension;
 import java.awt.Graphics;

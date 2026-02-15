@@ -1,5 +1,6 @@
 package com.saygindogu.sheepgame;
 
+import com.saygindogu.sheepgame.model.*;
 import com.saygindogu.sheepgame.ui.*;
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.saygindogu.sheepgame.ui;
+package com.saygindogu.sheepgame.model;
 
 import java.awt.Graphics;
 

@@ -1,4 +1,4 @@
-package com.saygindogu.sheepgame.ui;
+package com.saygindogu.sheepgame.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,13 +26,6 @@ public class Water extends LocatableShape {
 		locationY = y;
 		this.width = width;
 		this.height = height;
-	}
-
-	@Override
-	public void setLocation(int x, int y) {
-		locationY = y;
-		locationX = x;
-
 	}
 
 	@Override
