@@ -2,6 +2,10 @@
 
 A survival game where you control a sheep trying to stay alive. Your sheep gets hungrier and thirstier over time — eat grass and drink water to survive as long as you can.
 
+![Main Menu](screenshots/current/main-menu.png)
+
+![Gameplay](screenshots/current/gameplay.png)
+
 ## How to Play
 
 - Use **arrow keys** or **WASD** to move the sheep
