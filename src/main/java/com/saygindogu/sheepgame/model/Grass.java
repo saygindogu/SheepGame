@@ -3,8 +3,12 @@ package com.saygindogu.sheepgame.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.Random;
 
 public class Grass extends LocatableShape {
 
@@ -44,13 +48,35 @@ public class Grass extends LocatableShape {
 
 	@Override
 	public void draw(Graphics g) {
-		Graphics g1 = g.create();
+		Graphics2D g2 = (Graphics2D) g.create();
+		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		g1.setColor( Color.GREEN);
-		g1.fillOval( locationX, locationY, width, height);
+		// Draw a dirt/ground patch
+		g2.setColor( new Color( 120, 80, 40));
+		g2.fillOval( locationX, locationY + height - height / 4, width, height / 4);
 
-		g1.dispose();
+		// Draw grass blades
+		g2.setStroke( new BasicStroke( 2));
+		int bladeCount = Math.max( 5, width / 6);
+		Random rand = new Random( locationX * 31 + locationY);
 
+		for( int i = 0; i < bladeCount; i++){
+			int baseX = locationX + rand.nextInt( width);
+			int baseY = locationY + height - height / 6;
+			int tipX = baseX + rand.nextInt( 11) - 5;
+			int tipY = locationY + rand.nextInt( height / 3);
+			int midX = (baseX + tipX) / 2 + rand.nextInt( 7) - 3;
+			int midY = (baseY + tipY) / 2;
+
+			// Vary the green shade per blade
+			int green = 140 + rand.nextInt( 80);
+			g2.setColor( new Color( 20, green, 20));
+
+			g2.drawLine( baseX, baseY, midX, midY);
+			g2.drawLine( midX, midY, tipX, tipY);
+		}
+
+		g2.dispose();
 	}
 
 }

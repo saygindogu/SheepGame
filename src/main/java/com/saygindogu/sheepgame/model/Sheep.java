@@ -20,11 +20,17 @@ public class Sheep extends LocatableShape implements Moveable {
     public static final int MAX_HUNGER = 10;
     public static final int MAX_THIRST = 50;
 
+    private static final double BASE_ACCELERATION = 1.0;
+    private static final double FRICTION = 0.85;
+    private static final double BASE_MAX_SPEED = 8.0;
+
     //Properties
     @Getter
     private int hunger;
     @Getter
     private int thirst;
+    private double xPos;
+    private double yPos;
     private int xLocation;
     private int yLocation;
     private int speed;
@@ -32,17 +38,33 @@ public class Sheep extends LocatableShape implements Moveable {
     private int width;
     private boolean isAlive;
     private Timer timer;
+    private double vx;
+    private double vy;
+    private double acceleration;
+    private double maxSpeed;
+    private boolean movingUp;
+    private boolean movingDown;
+    private boolean movingLeft;
+    private boolean movingRight;
 
     //Constructor
-    public Sheep() {
+    public Sheep(int hardness) {
         hunger = 0;
         thirst = 0;
+        xPos = 0;
+        yPos = 0;
         xLocation = 0;
         yLocation = 0;
         speed = 10;
         height = 40;
         width = 50;
         isAlive = true;
+        vx = 0;
+        vy = 0;
+        // Scale: difficulty 1 → full speed, difficulty 10 → 55% speed
+        double scale = 1.0 - (hardness - 1) * 0.05;
+        acceleration = BASE_ACCELERATION * scale;
+        maxSpeed = BASE_MAX_SPEED * scale;
 
         timer = new Timer(1000, e -> {
             hunger++;
@@ -128,37 +150,65 @@ public class Sheep extends LocatableShape implements Moveable {
 
     @Override
     public void goUp() {
-
-        if (yLocation - speed >= 0) {
-            yLocation = yLocation - speed;
-        }
-
+        movingUp = true;
     }
 
     @Override
     public void goDown() {
-
-        if (yLocation + speed + height <= SheepGame.GAME_SIZE_Y) {
-            yLocation = yLocation + speed;
-        }
-
+        movingDown = true;
     }
 
     @Override
     public void goLeft() {
-
-        if (xLocation - speed >= 0) {
-            xLocation = xLocation - speed;
-        }
-
+        movingLeft = true;
     }
 
     @Override
     public void goRight() {
-        if (xLocation + speed + width <= SheepGame.GAME_SIZE_X) {
-            xLocation = xLocation + speed;
+        movingRight = true;
+    }
+
+    public void stopUp() { movingUp = false; }
+    public void stopDown() { movingDown = false; }
+    public void stopLeft() { movingLeft = false; }
+    public void stopRight() { movingRight = false; }
+
+    public void tick() {
+        // Apply acceleration for held directions
+        if (movingUp) vy -= acceleration;
+        if (movingDown) vy += acceleration;
+        if (movingLeft) vx -= acceleration;
+        if (movingRight) vx += acceleration;
+
+        // Apply friction
+        vx *= FRICTION;
+        vy *= FRICTION;
+
+        // Clamp velocity to maxSpeed
+        double speed = Math.sqrt(vx * vx + vy * vy);
+        if (speed > maxSpeed) {
+            double scale = maxSpeed / speed;
+            vx *= scale;
+            vy *= scale;
         }
 
+        // Stop tiny drift
+        if (Math.abs(vx) < 0.1) vx = 0;
+        if (Math.abs(vy) < 0.1) vy = 0;
+
+        // Update precise position
+        xPos += vx;
+        yPos += vy;
+
+        // Clamp position to game bounds
+        if (xPos < 0) { xPos = 0; vx = 0; }
+        if (yPos < 0) { yPos = 0; vy = 0; }
+        if (xPos + width > SheepGame.GAME_SIZE_X) { xPos = SheepGame.GAME_SIZE_X - width; vx = 0; }
+        if (yPos + height > SheepGame.GAME_SIZE_Y) { yPos = SheepGame.GAME_SIZE_Y - height; vy = 0; }
+
+        // Sync int locations for rendering and collision
+        xLocation = (int) Math.round(xPos);
+        yLocation = (int) Math.round(yPos);
     }
 
     public void eat(Grass g) {

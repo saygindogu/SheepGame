@@ -8,42 +8,57 @@ import java.awt.event.KeyListener;
 public class SheepGameKeyListener implements KeyListener{
 
 	SheepGame game;
+	Runnable onReturnToMenu;
 
-	public SheepGameKeyListener( SheepGame game){
+	public SheepGameKeyListener( SheepGame game, Runnable onReturnToMenu){
 		super();
 		this.game = game;
-
+		this.onReturnToMenu = onReturnToMenu;
 	}
+
 		@Override
 		public void keyPressed(KeyEvent e) {
+			if( game.isGameOver() ){
+				onReturnToMenu.run();
+				return;
+			}
+
 			int key = e.getKeyCode();
 
-			if( key == KeyEvent.VK_UP ){
+			if( key == KeyEvent.VK_UP || key == KeyEvent.VK_W ){
 				game.getSheep().goUp();
 			}
-			else if( key == KeyEvent.VK_DOWN ){
+			else if( key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S ){
 				game.getSheep().goDown();
 			}
-			else if( key == KeyEvent.VK_LEFT ){
+			else if( key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A ){
 				game.getSheep().goLeft();
 			}
-			else if( key == KeyEvent.VK_RIGHT ){
+			else if( key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D ){
 				game.getSheep().goRight();
 			}
-
-			game.updateViews();
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-			// TODO Auto-generated method stub
+			int key = e.getKeyCode();
 
+			if( key == KeyEvent.VK_UP || key == KeyEvent.VK_W ){
+				game.getSheep().stopUp();
+			}
+			else if( key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S ){
+				game.getSheep().stopDown();
+			}
+			else if( key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A ){
+				game.getSheep().stopLeft();
+			}
+			else if( key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D ){
+				game.getSheep().stopRight();
+			}
 		}
 
 		@Override
 		public void keyTyped(KeyEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 	}
