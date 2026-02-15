@@ -1,4 +1,4 @@
-package com.sheepgame;
+package com.saygindogu.sheepgame.ui;
 
 public abstract class LocatableShape implements Shape, Locatable {
 
@@ -7,17 +7,17 @@ public abstract class LocatableShape implements Shape, Locatable {
 		int y, otherY;
 		int h, otherH;
 		int w, otherW;
-		
+
 		x = getLocationX();
 		y = getLocationY();
-		h = getHeigth();
+		h = getHeight();
 		w = getWidth();
-		
+
 		otherX = other.getLocationX();
 		otherY = other.getLocationY();
-		otherH = other.getHeigth();
+		otherH = other.getHeight();
 		otherW = other.getWidth();
-		
+
 		if( x > otherX ){
 			if( x - otherX > otherW )
 				return false;
@@ -26,7 +26,7 @@ public abstract class LocatableShape implements Shape, Locatable {
 			if( otherX - x > w )
 				return false;
 		}
-		
+
 		if( y > otherY){
 			if( y - otherY > otherH )
 				return false;
@@ -35,7 +35,7 @@ public abstract class LocatableShape implements Shape, Locatable {
 			if( otherY - y > h)
 				return false;
 		}
-		
+
 		return true;
 	}
 }

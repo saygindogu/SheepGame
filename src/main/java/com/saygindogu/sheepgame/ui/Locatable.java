@@ -1,4 +1,4 @@
-package com.sheepgame;
+package com.saygindogu.sheepgame.ui;
 
 public interface Locatable {
 
