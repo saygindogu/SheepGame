@@ -25,11 +25,11 @@ public class SheepGame {
 	private static final String MENU_CARD = "menu";
 	private static final String GAME_CARD = "game";
 
-	Random random;
+	Random random = new Random();
 	@Getter
 	Sheep sheep;
 	@Getter
-	List<Wolf> wolves;
+	List<Wolf> wolves = new ArrayList<>();
 	List<LocatableShape> otherObjects;
 	List<SheepGameView> views;
 	Timer timer;
@@ -37,9 +37,6 @@ public class SheepGame {
 	int difficultyLevel;
 
 	public SheepGame( int difficultyLevel){
-		sheep = new Sheep(difficultyLevel);
-		views = new ArrayList<>();
-
 		if( difficultyLevel > 10){
 			this.difficultyLevel = 10;
 		}
@@ -50,7 +47,10 @@ public class SheepGame {
 		else
 			this.difficultyLevel = difficultyLevel;
 
-		timer = new Timer( TIMER_CONSTANT / 10 * (difficultyLevel / 2 + 1), e -> {
+		sheep = new Sheep(this.difficultyLevel);
+		views = new ArrayList<>();
+
+		timer = new Timer( TIMER_CONSTANT / 10 * (this.difficultyLevel / 2 + 1), e -> {
 			createNewObject();
 			updateViews();
 		});
@@ -61,7 +61,7 @@ public class SheepGame {
 			}
 			updateViews();
 		});
-		initilize( 11 - difficultyLevel);
+		initilize( 11 - this.difficultyLevel);
 		timer.start();
 		physicsTimer.start();
 	}
@@ -133,8 +133,6 @@ public class SheepGame {
 	}
 
 	private void createNewObject() {
-		random = new Random();
-
 		// Scale size and value: difficulty 1 → full, difficulty 10 → 55%
 		double scale = 1.0 - (difficultyLevel - 1) * 0.05;
 

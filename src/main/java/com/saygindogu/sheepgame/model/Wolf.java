@@ -14,6 +14,16 @@ public class Wolf extends LocatableShape implements Drawable {
 
     public enum State { ROAMING, CHASING }
 
+    // Color palette constants
+    private static final Color LEG_COLOR = new Color(60, 40, 20);
+    private static final Color BODY_COLOR = new Color(90, 90, 100);
+    private static final Color BODY_OUTLINE_COLOR = new Color(60, 60, 70);
+    private static final Color TAIL_COLOR = new Color(80, 80, 90);
+    private static final Color HEAD_COLOR = new Color(70, 70, 80);
+    private static final Color SNOUT_COLOR = new Color(55, 55, 65);
+    private static final Color EYE_CHASING_COLOR = new Color(255, 165, 0);
+    private static final Color EYE_ROAMING_COLOR = new Color(255, 255, 0);
+
     private double xPos;
     private double yPos;
     private int xLocation;
@@ -126,7 +136,7 @@ public class Wolf extends LocatableShape implements Drawable {
         int cy = yLocation + height / 2;
 
         // Legs (dark brown)
-        g2.setColor(new Color(60, 40, 20));
+        g2.setColor(LEG_COLOR);
         int legW = width / 7;
         int legH = height / 3;
         g2.fillRoundRect(cx - width / 3, cy + height / 5, legW, legH, 2, 2);
@@ -135,31 +145,31 @@ public class Wolf extends LocatableShape implements Drawable {
         g2.fillRoundRect(cx + width / 4, cy + height / 5, legW, legH, 2, 2);
 
         // Body (dark gray)
-        g2.setColor(new Color(90, 90, 100));
+        g2.setColor(BODY_COLOR);
         g2.fillOval(cx - width / 2, cy - height / 4, width, height / 2);
 
         // Body outline
-        g2.setColor(new Color(60, 60, 70));
+        g2.setColor(BODY_OUTLINE_COLOR);
         g2.drawOval(cx - width / 2, cy - height / 4, width, height / 2);
 
         // Tail (dark gray triangle behind body)
-        g2.setColor(new Color(80, 80, 90));
+        g2.setColor(TAIL_COLOR);
         int[] tailX = { cx - width / 2 - 4, cx - width / 2, cx - width / 2 };
         int[] tailY = { cy - height / 8, cy - height / 6, cy + height / 8 };
         g2.fillPolygon(tailX, tailY, 3);
 
         // Head (darker, pointy snout to the right)
-        g2.setColor(new Color(70, 70, 80));
+        g2.setColor(HEAD_COLOR);
         int headW = width / 3;
         int headH = height / 3;
         g2.fillOval(cx + width / 4, cy - height / 3, headW, headH);
 
         // Snout
-        g2.setColor(new Color(55, 55, 65));
+        g2.setColor(SNOUT_COLOR);
         g2.fillOval(cx + width / 4 + headW / 2, cy - height / 4, headW / 2, headH / 2);
 
         // Ears (pointed triangles)
-        g2.setColor(new Color(70, 70, 80));
+        g2.setColor(HEAD_COLOR);
         int earBase = headW / 3;
         // Left ear
         int[] ear1X = { cx + width / 4 + headW / 4, cx + width / 4 + headW / 4 + earBase / 2, cx + width / 4 + headW / 4 + earBase };
@@ -171,7 +181,7 @@ public class Wolf extends LocatableShape implements Drawable {
         g2.fillPolygon(ear2X, ear2Y, 3);
 
         // Eyes - amber when chasing, yellow when roaming
-        Color eyeColor = (state == State.CHASING) ? new Color(255, 165, 0) : new Color(255, 255, 0);
+        Color eyeColor = (state == State.CHASING) ? EYE_CHASING_COLOR : EYE_ROAMING_COLOR;
         g2.setColor(eyeColor);
         int eyeSize = Math.max(3, width / 9);
         g2.fillOval(cx + width / 4 + headW / 3, cy - height / 4, eyeSize, eyeSize);

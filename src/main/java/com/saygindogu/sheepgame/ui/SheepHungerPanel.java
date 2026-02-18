@@ -47,21 +47,24 @@ public class SheepHungerPanel extends JPanel implements SheepGameView {
 		hunger.setValue( Sheep.MAX_HUNGER - game.getSheep().getHunger());
 		thirst.setValue( Sheep.MAX_THIRST - game.getSheep().getThirst());
 
-		// Wolf proximity warning
+		// Wolf proximity warning — thresholds derived from each wolf's detection radius
 		double nearest = Double.MAX_VALUE;
+		double nearestDetectRadius = 0;
 		int sheepX = game.getSheep().getLocationX();
 		int sheepY = game.getSheep().getLocationY();
 		for( Wolf w : game.getWolves() ){
 			double dist = Math.hypot( w.getLocationX() - sheepX, w.getLocationY() - sheepY);
 			if( dist < nearest ){
 				nearest = dist;
+				nearestDetectRadius = w.getDetectionRadius();
 			}
 		}
-		if( nearest <= 150 ){
+		// Red when inside detection radius (wolf is chasing), orange when within 1.5x radius
+		if( nearest <= nearestDetectRadius ){
 			wolfWarning.setText( "WOLF! " + (int) nearest + "px");
 			wolfWarning.setForeground( Color.RED);
 			wolfWarning.setVisible( true);
-		} else if( nearest <= 400 ){
+		} else if( nearest <= nearestDetectRadius * 1.5 ){
 			wolfWarning.setText( "WOLF! " + (int) nearest + "px");
 			wolfWarning.setForeground( Color.ORANGE);
 			wolfWarning.setVisible( true);
