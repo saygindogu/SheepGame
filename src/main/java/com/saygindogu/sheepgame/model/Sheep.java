@@ -19,16 +19,22 @@ public class Sheep extends LocatableShape implements Moveable {
 
     public static final int MAX_HUNGER = 10;
     public static final int MAX_THIRST = 50;
+    public static final int MAX_FATIGUE = 100;
 
     private static final double BASE_ACCELERATION = 1.0;
     private static final double FRICTION = 0.85;
     private static final double BASE_MAX_SPEED = 8.0;
+    private static final double BASE_FATIGUE_RATE = 0.08;
+    private static final double FATIGUE_RECOVERY_IDLE = 0.03;
 
     //Properties
     @Getter
     private int hunger;
     @Getter
     private int thirst;
+    @Getter
+    private double fatigue;
+    private final double fatigueScale;
     private double xPos;
     private double yPos;
     private int xLocation;
@@ -51,6 +57,7 @@ public class Sheep extends LocatableShape implements Moveable {
     public Sheep(int hardness) {
         hunger = 0;
         thirst = 0;
+        fatigue = 0.0;
         xPos = 0;
         yPos = 0;
         xLocation = 0;
@@ -65,6 +72,7 @@ public class Sheep extends LocatableShape implements Moveable {
         double scale = 1.0 - (hardness - 1) * 0.05;
         acceleration = BASE_ACCELERATION * scale;
         maxSpeed = BASE_MAX_SPEED * scale;
+        fatigueScale = 1.0 + (hardness - 1) * 0.06;
 
         timer = new Timer(1000, e -> {
             hunger++;
@@ -174,7 +182,7 @@ public class Sheep extends LocatableShape implements Moveable {
     public void stopRight() { movingRight = false; }
 
     public void tick() {
-        // Apply acceleration for held directions
+        // Apply acceleration for held directions (unchanged by fatigue)
         if (movingUp) vy -= acceleration;
         if (movingDown) vy += acceleration;
         if (movingLeft) vx -= acceleration;
@@ -184,10 +192,14 @@ public class Sheep extends LocatableShape implements Moveable {
         vx *= FRICTION;
         vy *= FRICTION;
 
-        // Clamp velocity to maxSpeed
+        // Compute effective max speed based on fatigue
+        double exhaustionRatio = fatigue / MAX_FATIGUE;
+        double effectiveMaxSpeed = maxSpeed * (1.0 - 0.60 * exhaustionRatio);
+
+        // Clamp velocity to effectiveMaxSpeed
         double speed = Math.sqrt(vx * vx + vy * vy);
-        if (speed > maxSpeed) {
-            double scale = maxSpeed / speed;
+        if (speed > effectiveMaxSpeed) {
+            double scale = effectiveMaxSpeed / speed;
             vx *= scale;
             vy *= scale;
         }
@@ -209,6 +221,16 @@ public class Sheep extends LocatableShape implements Moveable {
         // Sync int locations for rendering and collision
         xLocation = (int) Math.round(xPos);
         yLocation = (int) Math.round(yPos);
+
+        // Fatigue accumulation / recovery
+        double currentSpeed = Math.hypot(vx, vy);
+        double speedRatio = currentSpeed / maxSpeed;
+        if (speedRatio > 0.1) {
+            fatigue += BASE_FATIGUE_RATE * speedRatio * fatigueScale;
+        } else {
+            fatigue -= FATIGUE_RECOVERY_IDLE * fatigueScale;
+        }
+        fatigue = Math.max(0.0, Math.min(MAX_FATIGUE, fatigue));
     }
 
     public void eat(Grass g) {
@@ -219,6 +241,10 @@ public class Sheep extends LocatableShape implements Moveable {
 
     public void drink(Water w) {
         thirst = max(0, thirst - w.getVolume());
+    }
+
+    public void rest(RestingSpot rs) {
+        fatigue = Math.max(0.0, fatigue - rs.getRestPower());
     }
 
     public void die() {

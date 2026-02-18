@@ -30,6 +30,7 @@ public class SheepGame {
 	Sheep sheep;
 	@Getter
 	List<Wolf> wolves = new ArrayList<>();
+	List<RestingSpot> restingSpots = new ArrayList<>();
 	List<LocatableShape> otherObjects;
 	List<SheepGameView> views;
 	Timer timer;
@@ -98,6 +99,13 @@ public class SheepGame {
 			}
 		}
 
+		// Check resting spot collisions (never removed)
+		for( RestingSpot rs : restingSpots ){
+			if( sheep.overlaps( rs) ){
+				sheep.rest( rs);
+			}
+		}
+
 		Iterator<LocatableShape> it = otherObjects.iterator();
 		while( it.hasNext() ){
 			LocatableShape obj = it.next();
@@ -129,6 +137,28 @@ public class SheepGame {
 		wolves = new ArrayList<>();
 		for( int i = 0; i < wolfCount; i++){
 			wolves.add( new Wolf( chaseSpeed, roamSpeed, detectRadius));
+		}
+
+		// Create resting spots — fewer at higher difficulty
+		int restCount = Math.max(1, 4 - difficultyLevel / 3);
+		restingSpots = new ArrayList<>();
+		double scale = 1.0 - (difficultyLevel - 1) * 0.05;
+		int minRestSize = Math.max(30, (int)(60 * scale));
+		int restSizeRange = Math.max(20, (int)(40 * scale));
+		int maxAttempts = restCount * 20;
+		int attempts = 0;
+		for( int i = 0; i < restCount && attempts < maxAttempts; i++){
+			int w = minRestSize + random.nextInt(restSizeRange);
+			int h = minRestSize + random.nextInt(restSizeRange);
+			int locX = random.nextInt(GAME_SIZE_X - w);
+			int locY = random.nextInt(GAME_SIZE_Y - h);
+			RestingSpot rs = new RestingSpot(locX, locY, w, h);
+			attempts++;
+			if( !isOverlaping(rs) && !isOverlapingRestingSpots(rs) ){
+				restingSpots.add(rs);
+			} else {
+				i--; // retry placement
+			}
 		}
 	}
 
@@ -175,6 +205,15 @@ public class SheepGame {
 			}
 		}
 
+		return false;
+	}
+
+	private boolean isOverlapingRestingSpots( LocatableShape shape) {
+		for( RestingSpot rs : restingSpots ){
+			if( shape.overlaps( rs) ){
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -243,9 +282,12 @@ public class SheepGame {
 	}
 
 	public Drawable[] getDrawables() {
-		Drawable[] drawables = new Drawable[ otherObjects.size() + wolves.size() + 1];
+		Drawable[] drawables = new Drawable[ restingSpots.size() + otherObjects.size() + wolves.size() + 1];
 
 		int idx = 0;
+		for( int i = 0; i < restingSpots.size(); i++){
+			drawables[idx++] = restingSpots.get(i);
+		}
 		for( int i = 0; i < otherObjects.size(); i++){
 			drawables[idx++] = otherObjects.get(i);
 		}
