@@ -28,6 +28,8 @@ public class SheepGame {
 	Random random;
 	@Getter
 	Sheep sheep;
+	@Getter
+	List<Wolf> wolves;
 	List<LocatableShape> otherObjects;
 	List<SheepGameView> views;
 	Timer timer;
@@ -54,6 +56,9 @@ public class SheepGame {
 		});
 		physicsTimer = new Timer( 16, e -> {
 			sheep.tick();
+			for( Wolf w : wolves ){
+				w.tick( sheep.getLocationX(), sheep.getLocationY());
+			}
 			updateViews();
 		});
 		initilize( 11 - difficultyLevel);
@@ -85,6 +90,14 @@ public class SheepGame {
 	}
 
 	private void checkCollisions(){
+		// Check wolf-sheep collisions first
+		for( Wolf w : wolves ){
+			if( w.overlaps( sheep) ){
+				sheep.die();
+				return;
+			}
+		}
+
 		Iterator<LocatableShape> it = otherObjects.iterator();
 		while( it.hasNext() ){
 			LocatableShape obj = it.next();
@@ -106,6 +119,16 @@ public class SheepGame {
 
 		for( int i = 0; i < hardness; i++){
 			createNewObject();
+		}
+
+		// Create wolves based on difficulty
+		int wolfCount = Math.max(0, (difficultyLevel - 1) / 2);
+		double chaseSpeed = 2.0 + difficultyLevel * 0.25;
+		double roamSpeed = 0.8 + difficultyLevel * 0.15;
+		double detectRadius = 150 + difficultyLevel * 25;
+		wolves = new ArrayList<>();
+		for( int i = 0; i < wolfCount; i++){
+			wolves.add( new Wolf( chaseSpeed, roamSpeed, detectRadius));
 		}
 	}
 
@@ -222,13 +245,16 @@ public class SheepGame {
 	}
 
 	public Drawable[] getDrawables() {
-		Drawable[] drawables = new Drawable[ otherObjects.size() + 1];
+		Drawable[] drawables = new Drawable[ otherObjects.size() + wolves.size() + 1];
 
-		for( int i = 0; i < otherObjects.size(); i++)
-		{
-			drawables[i] = otherObjects.get(i);
+		int idx = 0;
+		for( int i = 0; i < otherObjects.size(); i++){
+			drawables[idx++] = otherObjects.get(i);
 		}
-		drawables[ drawables.length - 1] = sheep;
+		for( int i = 0; i < wolves.size(); i++){
+			drawables[idx++] = wolves.get(i);
+		}
+		drawables[idx] = sheep;
 		return drawables;
 	}
 
