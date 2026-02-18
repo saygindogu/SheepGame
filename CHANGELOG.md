@@ -61,6 +61,41 @@ Difficulty stopped being just "how fast do things spawn" and started meaning som
 
 ---
 
+### February 18, 2026 — The Agents Take Over
+
+Three days after the revival, the project crossed a new threshold: features were no longer written by hand. A pipeline of specialised AI subagents — each with its own role, memory, and toolset — designed, implemented, reviewed, and fixed the next major update entirely autonomously.
+
+The human's job was to say *yes*.
+
+---
+
+### v2.4 — Wolf Predator (Feb 18, 2026)
+
+*Designed by the **game-designer** agent. Implemented by the **developer** agent. Reviewed and fixed through two automated passes by the **code-reviewer** and **developer** agents.*
+
+The sheep now has a predator:
+
+- **Wolves** spawn on the canvas edges and roam toward random waypoints
+- When a sheep comes within detection range, the wolf locks on and **chases in a straight line** — eyes turning amber to signal the hunt
+- Contact is an **instant kill**, bypassing hunger and thirst entirely
+- Wolves scale with difficulty: none at level 1, up to 4 at level 10
+- The **sidebar warns** the player as a wolf closes in — orange beyond detection range, red when inside it
+- The existing `physicsTimer` drives wolf movement at 60fps — no new timers
+
+#### How It Was Built
+
+The `game-designer` agent read the codebase, studied the balance numbers, and produced a full feature spec in `out/feature-wolf-predator.md` — including difficulty tables, architecture diagrams, and acceptance criteria.
+
+The `developer` agent read the spec, implemented `Wolf.java`, updated `SheepGame.java` and `SheepHungerPanel.java`, ran the build, then automatically invoked the `code-reviewer` agent on its own output.
+
+The `code-reviewer` agent filed a structured report in `out/review-wolf-predator.md` identifying five issues — a null-reference window, a random instance re-seeded on every spawn, a difficulty clamp applied after the `Sheep` constructor already consumed the raw value, hardcoded warning thresholds disconnected from the wolf's actual detection formula, and per-frame color allocations in `draw()`.
+
+The `developer` agent read the report, fixed all five issues, verified the build passed, and logged the session to `memory/developer.jsonl` for future reference.
+
+No human wrote a line of Java.
+
+---
+
 ### What Changed in Numbers
 
 | Aspect | 2015 | 2026 |
@@ -73,3 +108,6 @@ Difficulty stopped being just "how fast do things spawn" and started meaning som
 | Menu | None (hardcoded start) | Difficulty selection screen |
 | Build system | Eclipse project | Gradle + Java 21 + Lombok |
 | Time between updates | — | 11 years |
+| Wolf predator | None | Roaming/chasing enemy, scales with difficulty |
+| Feature authorship | Human | AI subagent pipeline (designer → developer → reviewer) |
+| Code review | Manual | Automated, structured, with memory across sessions |
