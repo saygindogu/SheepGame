@@ -10,7 +10,7 @@ import java.awt.RenderingHints;
 import java.util.Random;
 
 @Getter
-public class RestingSpot extends LocatableShape implements Drawable {
+public class RestingSpot extends LocatableShape {
 
     // Color palette constants
     private static final Color EARTH_COLOR = new Color(180, 150, 100);
@@ -18,17 +18,18 @@ public class RestingSpot extends LocatableShape implements Drawable {
     private static final Color PEBBLE_COLOR = new Color(140, 110, 70);
     private static final Color OUTLINE_COLOR = new Color(120, 90, 50);
 
-    private final double restPower = 2.0;
+    private final double restPower;
     private final int locationX;
     private final int locationY;
     private final int width;
     private final int height;
 
-    public RestingSpot(int x, int y, int width, int height) {
+    public RestingSpot(int x, int y, int width, int height, int difficultyLevel) {
         this.locationX = x;
         this.locationY = y;
         this.width = width;
         this.height = height;
+        this.restPower = Math.max(0.5, 2.0 / (1.0 + (difficultyLevel - 1) * 0.08));
     }
 
     @Override

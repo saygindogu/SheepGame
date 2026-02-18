@@ -56,7 +56,7 @@ public class SheepHungerPanel extends JPanel implements SheepGameView {
 
 		// Stamina bar: full = fresh, empty = exhausted
 		double fatigue = game.getSheep().getFatigue();
-		stamina.setValue( Sheep.MAX_FATIGUE - (int) fatigue);
+		stamina.setValue( Sheep.MAX_FATIGUE - (int) Math.round(fatigue));
 
 		// Stamina bar color based on fatigue level
 		if( fatigue > 90 ){

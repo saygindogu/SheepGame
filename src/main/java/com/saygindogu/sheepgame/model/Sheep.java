@@ -52,6 +52,7 @@ public class Sheep extends LocatableShape implements Moveable {
     private boolean movingDown;
     private boolean movingLeft;
     private boolean movingRight;
+    private boolean onRestSpot;
 
     //Constructor
     public Sheep(int hardness) {
@@ -227,8 +228,8 @@ public class Sheep extends LocatableShape implements Moveable {
         double speedRatio = currentSpeed / maxSpeed;
         if (speedRatio > 0.1) {
             fatigue += BASE_FATIGUE_RATE * speedRatio * fatigueScale;
-        } else {
-            fatigue -= FATIGUE_RECOVERY_IDLE * fatigueScale;
+        } else if (!onRestSpot) {
+            fatigue -= FATIGUE_RECOVERY_IDLE / fatigueScale;
         }
         fatigue = Math.max(0.0, Math.min(MAX_FATIGUE, fatigue));
     }

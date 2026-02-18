@@ -100,8 +100,10 @@ public class SheepGame {
 		}
 
 		// Check resting spot collisions (never removed)
+		sheep.setOnRestSpot( false);
 		for( RestingSpot rs : restingSpots ){
 			if( sheep.overlaps( rs) ){
+				sheep.setOnRestSpot( true);
 				sheep.rest( rs);
 			}
 		}
@@ -145,19 +147,17 @@ public class SheepGame {
 		double scale = 1.0 - (difficultyLevel - 1) * 0.05;
 		int minRestSize = Math.max(30, (int)(60 * scale));
 		int restSizeRange = Math.max(20, (int)(40 * scale));
-		int maxAttempts = restCount * 20;
-		int attempts = 0;
-		for( int i = 0; i < restCount && attempts < maxAttempts; i++){
-			int w = minRestSize + random.nextInt(restSizeRange);
-			int h = minRestSize + random.nextInt(restSizeRange);
-			int locX = random.nextInt(GAME_SIZE_X - w);
-			int locY = random.nextInt(GAME_SIZE_Y - h);
-			RestingSpot rs = new RestingSpot(locX, locY, w, h);
-			attempts++;
-			if( !isOverlaping(rs) && !isOverlapingRestingSpots(rs) ){
-				restingSpots.add(rs);
-			} else {
-				i--; // retry placement
+		for( int i = 0; i < restCount; i++){
+			for( int attempt = 0; attempt < 20; attempt++){
+				int w = minRestSize + random.nextInt(restSizeRange);
+				int h = minRestSize + random.nextInt(restSizeRange);
+				int locX = random.nextInt(GAME_SIZE_X - w);
+				int locY = random.nextInt(GAME_SIZE_Y - h);
+				RestingSpot rs = new RestingSpot(locX, locY, w, h, difficultyLevel);
+				if( !isOverlaping(rs) && !isOverlapingRestingSpots(rs) ){
+					restingSpots.add(rs);
+					break;
+				}
 			}
 		}
 	}
@@ -177,14 +177,14 @@ public class SheepGame {
 
 		if( oType == 0){
 			Grass grass = new Grass( value, locX, locY, width, height);
-			if( !isOverlaping( grass) )
+			if( !isOverlaping( grass) && !isOverlapingRestingSpots( grass) )
 			{
 				otherObjects.add( grass);
 			}
 		}
 		else if( oType == 1){
 			Water water = new Water( value, locX, locY, width, height);
-			if( !isOverlaping( water) )
+			if( !isOverlaping( water) && !isOverlapingRestingSpots( water) )
 			{
 				otherObjects.add( water);
 			}
