@@ -96,6 +96,32 @@ No human wrote a line of Java.
 
 ---
 
+### v2.5 — Stamina & Rest Spots (Feb 18, 2026)
+
+*Designed by the **game-designer** agent. Implemented, reviewed twice, and fixed by the **developer** and **code-reviewer** agents in two automated passes.*
+
+The sheep now has a stamina budget:
+
+- **Sprinting drains fatigue** — moving fast costs stamina proportional to current speed; standing still recovers it slowly
+- **Rest spots** — permanent tan earth patches scattered across the canvas; standing on one restores stamina quickly (~0.8 seconds to full)
+- **Speed penalty** — at full exhaustion the sheep's effective top speed drops to 40% of normal, making a tired sheep dramatically more vulnerable to wolves
+- **Stamina bar** added to the sidebar — turns orange above 70% fatigue, red above 90%
+- Rest spots and fatigue accumulation both scale with difficulty: fewer spots (3 → 1) and faster drain (×1.54 at level 10) compound the existing wolf and resource pressure
+
+The new decision the mechanic creates: *"Do I sprint to that grass patch and arrive exhausted near a wolf, or pace myself?"*
+
+#### How It Was Built
+
+The `game-designer` agent identified that the current loop had no planning horizon — every move was reactive. Stamina makes *how you move* a resource the player manages, not just *where you go*.
+
+The `developer` agent implemented `RestingSpot.java`, extended `Sheep.java` with fatigue tick logic and a speed penalty, updated `SheepGame.java`, and reworked `SheepHungerPanel` to a three-bar layout. It then invoked the `code-reviewer` automatically.
+
+The `code-reviewer` found one medium bug (idle recovery was scaling in the wrong direction — faster at higher difficulty instead of slower), three low issues (runtime grass spawner could overlap rest spots, `restPower` was not difficulty-scaled, each rest spot lacked its own retry budget in placement), and one compounding issue (double recovery when idle on a rest spot). It also caught two safe nitpicks.
+
+The `developer` read the full review, applied all seven fixes across four files, and verified the build.
+
+---
+
 ### What Changed in Numbers
 
 | Aspect | 2015 | 2026 |
@@ -111,3 +137,5 @@ No human wrote a line of Java.
 | Wolf predator | None | Roaming/chasing enemy, scales with difficulty |
 | Feature authorship | Human | AI subagent pipeline (designer → developer → reviewer) |
 | Code review | Manual | Automated, structured, with memory across sessions |
+| Stamina system | None | Fatigue drains on movement, rest spots restore it |
+| Rest spots | None | Permanent earth patches, difficulty-scaled count and recovery rate |
